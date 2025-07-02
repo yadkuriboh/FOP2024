@@ -1,4 +1,4 @@
-#
+# Program by Yadhav Ramsahye (Yadkuriboh)
 # bridge_advanced.py - The Holy Grail Bridge Scene (ULTIMATE EDITION!)
 #
 
