@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏰 Bridge of Death Adventure</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+            color: #fff;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Animated background stars */
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 2s infinite alternate;
+        }
+
+        @keyframes twinkle {
+            0% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+
+        /* Castle silhouette */
+        .castle {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 300px;
+            height: 150px;
+            background: linear-gradient(to top, #1a1a1a, #333);
+            clip-path: polygon(0% 100%, 0% 60%, 15% 60%, 15% 40%, 25% 40%, 25% 50%, 35% 50%, 35% 30%, 45% 30%, 45% 45%, 55% 45%, 55% 30%, 65% 30%, 65% 50%, 75% 50%, 75% 40%, 85% 40%, 85% 60%, 100% 60%, 100% 100%);
+            z-index: 2;
+        }
+
+        .game-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .bridge-scene {
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 20px;
+            padding: 30px;
+            margin: 20px 0;
+            border: 3px solid #ffd700;
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bridge-scene::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 215, 0, 0.1), transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        .title {
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.8);
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.8), 0 0 20px rgba(255, 215, 0, 0.5); }
+            to { text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.8), 0 0 30px rgba(255, 215, 0, 0.8); }
+        }
+
+        .keeper {
+            text-align: center;
+            font-size: 4em;
+            margin: 20px 0;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .dialogue {
+            background: rgba(0, 0, 0, 0.9);
+            border-left: 5px solid #ff6b6b;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 10px;
+            font-size: 1.2em;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(-50px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .input-group {
+            margin: 20px 0;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 1.3em;
+            color: #ffd700;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.1em;
+            border: 2px solid #ffd700;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #ff6b6b;
+            box-shadow: 0 0 20px rgba(255, 107, 107, 0.5);
+            transform: scale(1.02);
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2em;
+            color: white;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
+            text-transform: uppercase;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.5);
+        }
+
+        .btn:active {
+            transform: translateY(0) scale(0.98);
+        }
+
+        .result {
+            margin-top: 30px;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            font-size: 1.3em;
+            animation: resultAppear 1s ease-out;
+        }
+
+        @keyframes resultAppear {
+            0% { transform: scale(0.5) rotate(-5deg); opacity: 0; }
+            50% { transform: scale(1.1) rotate(2deg); opacity: 0.8; }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+
+        .result.success {
+            background: linear-gradient(45deg, #4CAF50, #66BB6A);
+            border: 3px solid #2E7D32;
+        }
+
+        .result.failure {
+            background: linear-gradient(45deg, #f44336, #ef5350);
+            border: 3px solid #c62828;
+        }
+
+        .result.trick {
+            background: linear-gradient(45deg, #FF9800, #FFB74D);
+            border: 3px solid #F57C00;
+        }
+
+        .summary {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 20px;
+            border: 2px solid #ffd700;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .typing {
+            overflow: hidden;
+            border-right: 2px solid #ffd700;
+            white-space: nowrap;
+            animation: typing 3s steps(40, end), blink-caret 0.75s step-end infinite;
+        }
+
+        @keyframes typing {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+
+        @keyframes blink-caret {
+            from, to { border-color: transparent; }
+            50% { border-color: #ffd700; }
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ffd700, #ff6b6b);
+            width: 0%;
+            transition: width 1s ease;
+        }
+
+        @media (max-width: 768px) {
+            .title {
+                font-size: 2em;
+            }
+            .keeper {
+                font-size: 3em;
+            }
+            .game-container {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="stars"></div>
+    <div class="castle"></div>
+    
+    <div class="game-container">
+        <div class="bridge-scene">
+            <h1 class="title">🏰 THE BRIDGE OF DEATH 🏰</h1>
+            
+            <div class="keeper">🧙‍♂️</div>
+            
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar"></div>
+            </div>
+            
+            <div id="gameContent">
+                <div class="dialogue typing" id="intro">
+                    STOP! Who would cross the Bridge of Death must answer me these questions three, ere the other side he see!
+                </div>
+                
+                <div class="input-group hidden" id="nameGroup">
+                    <label for="nameInput">🗣️ What... is your name?</label>
+                    <input type="text" id="nameInput" placeholder="Sir Lancelot of Camelot">
+                </div>
+                
+                <div class="input-group hidden" id="questGroup">
+                    <label for="questInput">⚔️ What... is your quest?</label>
+                    <input type="text" id="questInput" placeholder="To seek the Holy Grail">
+                </div>
+                
+                <div class="input-group hidden" id="colorGroup">
+                    <label for="colorInput">🎨 What... is your favourite colour?</label>
+                    <input type="text" id="colorInput" placeholder="Blue... no, yellow!">
+                </div>
+                
+                <button class="btn hidden" id="submitBtn" onclick="judgeAnswers()">
+                    ✨ FACE YOUR DESTINY ✨
+                </button>
+                
+                <div id="result" class="hidden"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Create animated stars
+        function createStars() {
+            const starsContainer = document.querySelector('.stars');
+            for (let i = 0; i < 100; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.width = Math.random() * 3 + 'px';
+                star.style.height = star.style.width;
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDelay = Math.random() * 2 + 's';
+                starsContainer.appendChild(star);
+            }
+        }
+
+        // Progressive question revealing
+        let currentQuestion = 0;
+        const questions = ['nameGroup', 'questGroup', 'colorGroup'];
+
+        function showNextQuestion() {
+            if (currentQuestion < questions.length) {
+                document.getElementById(questions[currentQuestion]).classList.remove('hidden');
+                document.getElementById('progressBar').style.width = ((currentQuestion + 1) / 4) * 100 + '%';
+                currentQuestion++;
+                
+                if (currentQuestion === questions.length) {
+                    setTimeout(() => {
+                        document.getElementById('submitBtn').classList.remove('hidden');
+                        document.getElementById('progressBar').style.width = '100%';
+                    }, 500);
+                }
+            }
+        }
+
+        // Bridge Keeper responses
+        const keeperResponses = [
+            "🤔 Hmm... interesting...",
+            "📝 *scribbles notes mysteriously*",
+            "👁️ The keeper's eyes narrow...",
+            "🧙‍♂️ Most peculiar indeed...",
+            "⚡ *thunder rumbles in the distance*"
+        ];
+
+        function showKeeperResponse() {
+            const keeper = document.querySelector('.keeper');
+            const originalText = keeper.textContent;
+            keeper.textContent = keeperResponses[Math.floor(Math.random() * keeperResponses.length)];
+            keeper.style.animation = 'none';
+            keeper.style.transform = 'scale(1.1)';
+            
+            setTimeout(() => {
+                keeper.textContent = originalText;
+                keeper.style.animation = 'float 3s ease-in-out infinite';
+                keeper.style.transform = 'scale(1)';
+                showNextQuestion();
+            }, 1500);
+        }
+
+        // Add enter key listeners
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault(); // Prevent form submission
+                
+                // Check if we're currently showing a question
+                if (currentQuestion > 0 && currentQuestion <= questions.length) {
+                    const currentQuestionId = questions[currentQuestion - 1];
+                    const currentInput = document.querySelector(`#${currentQuestionId} input`);
+                    
+                    if (currentInput && currentInput.value.trim() && currentQuestion < questions.length) {
+                        showKeeperResponse();
+                    } else if (currentQuestion === questions.length) {
+                        // All questions answered, check if submit button is visible
+                        const submitBtn = document.getElementById('submitBtn');
+                        if (!submitBtn.classList.contains('hidden')) {
+                            judgeAnswers();
+                        }
+                    }
+                }
+            }
+        });
+
+        // Judgment logic
+        function judgeAnswers() {
+            const name = document.getElementById('nameInput').value.trim();
+            const quest = document.getElementById('questInput').value.trim();
+            const color = document.getElementById('colorInput').value.trim();
+            
+            if (!name || !quest || !color) {
+                alert('🧙‍♂️ You must answer all questions, brave knight!');
+                return;
+            }
+
+            const dangerousWords = ['destroy', 'kill', 'conquer', 'eliminate', 'murder', 'harm'];
+            const questDangerous = dangerousWords.some(word => quest.toLowerCase().includes(word));
+            const safeColors = ['blue', 'green', 'yellow', 'red', 'purple', 'orange', 'black', 'white'];
+            const colorSafe = safeColors.some(safeColor => color.toLowerCase().includes(safeColor));
+            
+            let resultClass, resultText, resultIcon;
+            
+            if (questDangerous) {
+                resultClass = 'failure';
+                resultIcon = '💀';
+                resultText = `
+                    <h2>${resultIcon} CAST INTO THE GORGE! ${resultIcon}</h2>
+                    <p>BRIDGE KEEPER: "Your quest sounds rather... EVIL!"</p>
+                    <p>"AIIIEEEEEE!" *throws you off the bridge*</p>
+                    <div class="summary">
+                        <h3>💀 Your Final Moments:</h3>
+                        <p><strong>Name:</strong> ${name}</p>
+                        <p><strong>Evil Quest:</strong> ${quest}</p>
+                        <p><strong>Color:</strong> ${color}</p>
+                        <p><em>💡 Tip: Try a more noble quest next time!</em></p>
+                    </div>
+                `;
+            } else if (!colorSafe && Math.random() > 0.6) {
+                resultClass = 'trick';
+                resultIcon = '🤔';
+                resultText = `
+                    <h2>${resultIcon} TRICK QUESTION! ${resultIcon}</h2>
+                    <p>BRIDGE KEEPER: "${color}? What do you mean?"</p>
+                    <p>"African or European ${color}?"</p>
+                    <p>*chuckles* "Just kidding... Off you go!"</p>
+                    <div class="summary">
+                        <h3>✨ You barely made it across!</h3>
+                        <p><strong>Name:</strong> ${name}</p>
+                        <p><strong>Quest:</strong> ${quest}</p>
+                        <p><strong>Suspicious Color:</strong> ${color}</p>
+                        <p><em>🥥 *Coconut hooves clip-clop into the distance...*</em></p>
+                    </div>
+                `;
+            } else {
+                resultClass = 'success';
+                resultIcon = '✅';
+                resultText = `
+                    <h2>${resultIcon} YOU MAY PASS! ${resultIcon}</h2>
+                    <p>BRIDGE KEEPER: "Right! Off you go!"</p>
+                    <p>"You have answered wisely, brave knight!"</p>
+                    <div class="summary">
+                        <h3>🎉 Adventure Summary:</h3>
+                        <p><strong>Knight's Name:</strong> ${name}</p>
+                        <p><strong>Noble Quest:</strong> ${quest}</p>
+                        <p><strong>Favorite Color:</strong> ${color}</p>
+                        <p><em>Good luck with your ${quest} quest!</em></p>
+                        <p><em>Perhaps wearing ${color} armor would help! 👕</em></p>
+                    </div>
+                `;
+            }
+            
+            const resultDiv = document.getElementById('result');
+            resultDiv.className = `result ${resultClass}`;
+            resultDiv.innerHTML = resultText;
+            resultDiv.classList.remove('hidden');
+            
+            // Add restart button
+            setTimeout(() => {
+                const restartBtn = document.createElement('button');
+                restartBtn.className = 'btn';
+                restartBtn.innerHTML = '🔄 FACE THE BRIDGE AGAIN';
+                restartBtn.onclick = () => location.reload();
+                resultDiv.appendChild(restartBtn);
+            }, 2000);
+        }
+
+        // Add individual input listeners for better responsiveness
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add enter key listener to each input as it becomes visible
+            questions.forEach(questionId => {
+                const input = document.querySelector(`#${questionId} input`);
+                if (input) {
+                    input.addEventListener('keydown', function(event) {
+                        if (event.key === 'Enter' && this.value.trim()) {
+                            event.preventDefault();
+                            showKeeperResponse();
+                        }
+                    });
+                }
+            });
+        });
+        
+        // Start the sequence
+        setTimeout(() => {
+            showNextQuestion();
+        }, 3000);
+    </script>
+</body>
+</html>
